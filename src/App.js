@@ -79,7 +79,6 @@ function App() {
           >
             <option value="Orthographic">Orthographic</option>
             <option value="Airy">Airy</option>
-            {/* <option value="Armadillo">Armadillo</option> */}
             <option value="geoAzimuthalEqualArea">geoAzimuthalEqualArea</option>
             <option value="geoBromley">geoBromley</option>
             <option value="geoCylindricalEqualArea">
@@ -91,7 +90,7 @@ function App() {
             <option value="geoStereographic">geoStereographic</option>
             <option value="geoNaturalEarth1">geoNaturalEarth1</option>
           </select>
-        </div> */}
+        </div>  */}
 
         <Globe
           Projection={{
