@@ -70,7 +70,7 @@ function App() {
     <div className="App">
       <header className="App-header">Prototyp For React Globe</header>
       <main>
-        <div className="box" id="projectionChooseWrapper">
+        {/* <div className="box" id="projectionChooseWrapper">
           <label>choose a projection: </label>
           <select
             name="projectionSelector"
@@ -91,7 +91,7 @@ function App() {
             <option value="geoStereographic">geoStereographic</option>
             <option value="geoNaturalEarth1">geoNaturalEarth1</option>
           </select>
-        </div>
+        </div> */}
 
         <Globe
           Projection={{
