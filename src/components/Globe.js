@@ -26,13 +26,14 @@ export default class Globe extends Component {
       this.currentProjectionName = this.props.Projection.name;
     else this.currentProjectionName = "Orthographic";
 
-    this.AutoRotateStep = 0.2;
+    this.AutoRotateStep = 0.05;
 
     this.width = this.props.width;
     this.height = this.props.height;
 
     this.sphere = { type: "Sphere" };
     this.projection = null;
+    console.log(this.currentProjectionName)
     this.svg = null;
 
     this.availablePoints = [];
@@ -45,7 +46,8 @@ export default class Globe extends Component {
     this.pauseAutoRotation = false;
   }
 
-  testRotate = (world, context, path, canvas) => {
+  AutoRotation = (world, context, path, canvas) => {
+
     if (!this.pauseAutoRotation) {
       window.requestAnimationFrame(() => {
         rotation += this.AutoRotateStep;
@@ -62,67 +64,70 @@ export default class Globe extends Component {
         return;
       }
     }
-    if (!this.exit)
+    if (!this.exit){
       setTimeout(
-        () => this.testRotate(world, context, path, canvas),
+        () => this.AutoRotation(world, context, path, canvas),
         1000 / 60
-      ); //20fps (?)
+      ); 
+    }
   };
 
   createTranslucentGlobe = () => {
+
+    
     let canvas = d3
-      .select("#globe")
-      .append("canvas")
-      .attr("width", this.width)
-      .attr("height", this.height);
-
+    .select("#globe")
+    .append("canvas")
+    .attr("width", this.width)
+    .attr("height", this.height);
+    
     let canvasContext = canvas.node().getContext("2d");
-
+    
     this.canvasContext = canvasContext;
-
+    
     canvas = canvas._groups[0][0];
-
+    
     this.projection = this.currentProjection
-      .rotate([0, 0])
-      //.rotate([-10, -50]) //initial rotate to ~ center Austria (on orthographic earth usefull)
-      .precision(0.1)
-      .fitSize([this.width, this.height], this.sphere);
-
+    .rotate([0, 0])
+    //.rotate([-10, -50]) //initial rotate to ~ center Austria (on orthographic earth usefull)
+    .precision(0.1)
+    .fitSize([this.width, this.height], this.sphere);
+    
     let path = d3.geoPath(this.projection, canvasContext);
-
-    this.testRotate(GeoData, canvasContext, path, canvas);
+    
+    this.AutoRotation(GeoData, canvasContext, path, canvas);
 
     this.projection.scale(200); //initial zoom
     return d3
-      .select(canvasContext.canvas)
-      .call(
-        this.zoom(this.projection)
-          .on("zoom.render", () => {
-            this.pauseAutoRotation = true;
-            this.renderWorld(GeoData, canvasContext, path, canvas);
-          }) //only a rough map while zooming/rotating (speed reasons)
-          .on("end.render", () => {
-            this.renderWorld(GeoData, canvasContext, path, canvas);
-            this.pauseAutoRotation = false;
-          })
+    .select(canvasContext.canvas)
+    .call(
+      this.zoom(this.projection)
+      .on("zoom.render", () => {
+        this.pauseAutoRotation = true;
+        this.renderWorld(GeoData, canvasContext, path, canvas);
+      }) //only a rough map while zooming/rotating (speed reasons)
+      .on("end.render", () => {
+        this.renderWorld(GeoData, canvasContext, path, canvas);
+        this.pauseAutoRotation = false;
+      })
       ) //could specify a more detailed world
       .call(() => this.renderWorld(GeoData, canvasContext, path, canvas)) //could specify a more detailed world
       .node();
-  };
-
-  initializeSVG = () => {
-    //svg is for the globepoints
-    this.svg = d3
+    };
+    
+    initializeSVG = () => {
+      //svg is for the globepoints
+      this.svg = d3
       .select("#globepoints")
       .append("svg")
       .attr("width", this.width)
       .attr("height", this.height);
-  };
-
-  renderWorld(world, context, path, canvas) {
-    //clear canvas
+    };
+    
+    renderWorld(world, context, path, canvas) {
+      //clear canvas
     context.clearRect(0, 0, canvas.width, canvas.height);
-
+    
     context.lineWidth = 0.3;
     context.beginPath();
     path(this.sphere);
@@ -130,7 +135,7 @@ export default class Globe extends Component {
     context.fill();
     context.stroke();
     context.strokeStyle = "#042940";
-
+    
     if (this.currentProjectionName === "Orthographic") {
       //translucent part (by "fil" -> https://observablehq.com/@d3/projection-reflectx)
       const r = this.projection.rotate();
@@ -141,21 +146,21 @@ export default class Globe extends Component {
       context.fill();
       this.projection.reflectX(false).rotate(r);
     }
-
+    
     var graticule = d3.geoGraticule10();
-
+    
     context.beginPath();
     path(graticule);
     context.strokeStyle = "black";
     context.stroke();
-
+    
     //countries, stroke are the white gaps between them
     context.fillStyle = "rgba(4, 41, 64,1)";
     context.beginPath();
     path(world);
     context.fill();
     context.stroke();
-
+    
     // if you want to render the datapoints via canvas
     // context.beginPath(); //elements are now rendered with svg, to support better animations;
     // path.pointRadius([3])
@@ -163,16 +168,17 @@ export default class Globe extends Component {
     // context.fillStyle="tomato"
     // context.fill();
 
+    
     this.updatePointsOnGlobe();
   }
 
   updatePointsOnGlobe = () => {
     //select all existing circles and update their coordinates
     //if they are not visible on the earth (on the backside), change their opacity to 0
-
+    
     let circles = this.svg.selectAll("circle");
     circles
-      .attr("cx", (point) => this.projection(point)[0])
+    .attr("cx", (point) => this.projection(point)[0])
       .attr("cy", (point) => this.projection(point)[1])
       .attr("opacity", (point) => {
         if (this.isPointVisible(this.projection)(point)) return 1;
