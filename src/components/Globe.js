@@ -46,6 +46,7 @@ export default class Globe extends Component {
     this.pauseAutoRotation = false;
   }
 
+  //Does currently not work properly
   AutoRotation = (world, context, path, canvas) => {
 
     if (!this.pauseAutoRotation) {
@@ -95,7 +96,7 @@ export default class Globe extends Component {
     
     let path = d3.geoPath(this.projection, canvasContext);
     
-    this.AutoRotation(GeoData, canvasContext, path, canvas);
+    //this.AutoRotation(GeoData, canvasContext, path, canvas); does not work properly
 
     this.projection.scale(200); //initial zoom
     return d3
