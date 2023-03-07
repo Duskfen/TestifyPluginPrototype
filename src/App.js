@@ -25,8 +25,8 @@ function App() {
 
   useEffect(() => {
     
+    window.addEventListener("message", handleMessage) //change * to the testify api endpoint, be carefull about a trainling /
     window.parent.postMessage({source: "/testify/plugin/register"}, "*");
-    window.addEventListener("message", handleMessage) //change * to the testify api endpoint
     console.log("globe post message from", window.origin);
 
     return() => {
