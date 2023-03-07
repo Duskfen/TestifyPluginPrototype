@@ -1,6 +1,6 @@
 import "./App.css";
 import Globe from "./components/Globe";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   geoAzimuthalEqualArea,
   geoConicEqualArea,
@@ -22,6 +22,26 @@ function App() {
     geoOrthographic(),
     "Orthographic",
   ]);
+
+  useEffect(() => {
+    
+    window.parent.postMessage({source: "/testify/plugin/register"}, "*");
+    window.addEventListener("message", handleMessage) //change * to the testify api endpoint
+    console.log("globe post message from", window.origin);
+
+    return() => {
+      window.removeEventListener("message", handleMessage);
+    }
+  }, [])
+  
+  function handleMessage(e){
+    // if(event.origin !== testify.origin){
+    //   return;
+    // }
+    if(e.data.source === "/testify/plugin/register/acknowledge"){
+      console.log("globe got event:", e.data)
+    }
+  }
 
   const changeProjection = (e) => {
     console.log("switchProjection");
@@ -68,7 +88,7 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">Prototyp For React Globe</header>
+      <header className="App-header">Prototyp For Testify Plugin</header>
       <main>
         {/* <div className="box" id="projectionChooseWrapper">
           <label>choose a projection: </label>
