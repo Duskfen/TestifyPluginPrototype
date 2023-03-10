@@ -46,6 +46,7 @@ function App() {
         "Subject": credentials.userId
       }
     }).then((data) => {
+      console.log(data)
       setUser(data);
     })
   }, [credentials])
