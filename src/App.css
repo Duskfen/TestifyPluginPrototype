@@ -34,7 +34,16 @@
    margin-top:10px;
 }
 
+.box-wrapper{
+   position: absolute;
+   top:40px;
+   text-align: left;
+   left: 20px;
+}
+
 .box{
+   margin: 10px;
+   min-width: none;
    padding: 15px;
    background-color: #fff;
    box-shadow: 3px 5px 5px 1px #aaa;

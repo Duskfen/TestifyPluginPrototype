@@ -23,23 +23,39 @@ function App() {
     "Orthographic",
   ]);
 
-  useEffect(() => {
-    
-    window.addEventListener("message", handleMessage) //change * to the testify api endpoint, be carefull about a trainling /
-    window.parent.postMessage({source: "/testify/plugin/register"}, "*");
-    console.log("globe post message from", window.origin);
+  const [user, setUser] = useState(null);
+  const [credentials, setCredentials] = useState(null);
 
-    return() => {
+  useEffect(() => {
+    window.addEventListener("message", handleMessage); //change * to the testify api endpoint, be carefull about a trainling /
+    window.parent.postMessage({ source: "/testify/plugin/register" }, "*");
+
+    return () => {
       window.removeEventListener("message", handleMessage);
-    }
-  }, [])
-  
-  function handleMessage(e){
+    };
+  }, []);
+
+  useEffect(() => {
+    if(!credentials) return; 
+
+    fetch(`${credentials.api}/users/${credentials.userId}?api-version=${credentials.apiVersion}`, {
+      method: "GET",
+      headers: {
+        "secret": credentials.sessionToken,
+        "Tenant": credentials.tenantId,
+        "Subject": credentials.userId
+      }
+    }).then((data) => {
+      setUser(data);
+    })
+  }, [credentials])
+
+  function handleMessage(e) {
     // if(event.origin !== testify.origin){
     //   return;
     // }
-    if(e.data.source === "/testify/plugin/register/acknowledge"){
-      console.log("globe got event:", e.data)
+    if (e.data.source === "/testify/plugin/register/acknowledge") {
+      setCredentials(e.data.value);
     }
   }
 
@@ -90,6 +106,48 @@ function App() {
     <div className="App">
       <header className="App-header">Prototyp For Testify Plugin</header>
       <main>
+        <div className="box-wrapper">
+
+          <div className="box">
+            {credentials === null ? (
+              <>
+                <p>Establishing handshake with Testify Plugin-System...</p>
+              </>
+            ) : (
+              <>
+                <p>Connection Established</p>
+              </>
+            )}
+          </div>
+          <div className="box">
+            {credentials === null ? (
+              <p>
+                waiting until connection to the Testify Plugin-System is
+                established
+              </p>
+            ) : (
+              <>
+                {user === null ? (
+                  <>
+                    <p>Loading Userdata...</p>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <ul>
+                        <li>id:{user.id}</li>
+                        <li>email:{user.username}</li>
+                        <li>given-name:{user.givenName}</li>
+                        <li>familyName:{user.familyName}</li>
+                      </ul>
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+
         {/* <div className="box" id="projectionChooseWrapper">
           <label>choose a projection: </label>
           <select
