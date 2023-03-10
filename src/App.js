@@ -45,9 +45,9 @@ function App() {
         "Tenant": credentials.tenantId,
         "Subject": credentials.userId
       }
-    }).then((data) => {
-      console.log(data)
-      setUser(data);
+    }).then(async (res) => {
+      
+      setUser(await res.json());
     })
   }, [credentials])
 
@@ -135,11 +135,12 @@ function App() {
                 ) : (
                   <>
                     <div>
+                      User Data fetched from Testify:
                       <ul>
-                        <li>id:{user.id}</li>
-                        <li>email:{user.username}</li>
-                        <li>given-name:{user.givenName}</li>
-                        <li>familyName:{user.familyName}</li>
+                        <li>id: <b>{user.id}</b></li>
+                        <li>email: <b>{user.username}</b></li>
+                        <li>given-name: <b>{user.givenName}</b></li>
+                        <li>familyName: <b>{user.familyName}</b></li>
                       </ul>
                     </div>
                   </>
